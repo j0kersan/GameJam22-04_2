@@ -11,14 +11,26 @@ public class CharaMoveScript : MonoBehaviour
     #endregion
 
     #region MultipleJump
-    private bool isGrounded;
+    public bool isGrounded;
 
     public Transform groundCheck;
     public float checkRadius;
     public LayerMask whatIsGround;
 
-    private int extraJumps;
+    public int extraJumps;
     private int extraJumpsValue;
+    #endregion
+
+    #region WallJump
+    bool isTouchingFront;
+    bool isTouchingBack;
+    public bool wallJumping;
+
+    public LayerMask whatIsWall;
+    public Transform frontCheck;
+    public Transform backCheck;
+
+    public float wallJumpTime;
     #endregion
 
     private Rigidbody2D rb2d;
@@ -35,19 +47,26 @@ public class CharaMoveScript : MonoBehaviour
         jumpForce = 6;
 
         #region Movements
-        var movement = Input.GetAxis("Horizontal");
-        transform.position += new Vector3(movement, 0, 0) * Time.deltaTime * moveSpeed;
-        #endregion
+        float moves = Input.GetAxisRaw("Horizontal");
+        transform.position += new Vector3(moves, 0, 0) * Time.deltaTime * moveSpeed;
 
-        #region Slide
+            #endregion
 
-        #endregion 
+            #region Slide
 
-        #region Jump
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
+            #endregion
 
+            #region Jump
+            #region Multiple Jump
+            isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
+
+        if(isGrounded == false)
+        {
+            //anim saut est fausse
+        }
         if(isGrounded == true)
         {
+            //anim saut est vraie
             extraJumps = 1;
         }
 
@@ -66,7 +85,34 @@ public class CharaMoveScript : MonoBehaviour
             jumpForce = 12;
         }
         #endregion
+        #region WallJump
+        isTouchingFront = Physics2D.OverlapCircle(frontCheck.position, checkRadius, whatIsWall);
+        isTouchingBack = Physics2D.OverlapCircle(backCheck.position, checkRadius, whatIsWall);
+
+        if (isTouchingFront == true && isGrounded == false)
+        {
+            wallJumping = true;
+            Invoke("SetWallJumpingToFalse", wallJumpTime);
+        }
+
+        if (isTouchingBack == true && isGrounded == false)
+        {
+            wallJumping = true;
+             Invoke("SetWallJumpingToFalse", wallJumpTime);
+        }
+
+        if (wallJumping == true)
+        {
+            extraJumps = 1;
+        }
+        #endregion
+        #endregion
 
 
+    }
+
+    void SetWallJumpingToFalse()
+    {
+        wallJumping = false;
     }
 }
